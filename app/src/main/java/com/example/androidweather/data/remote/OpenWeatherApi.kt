@@ -1,4 +1,4 @@
-package com.example.androidweather.data.api
+package com.example.androidweather.data.remote
 
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -7,7 +7,7 @@ import org.koin.core.component.KoinComponent
 
 class OpenWeatherApi(
     private val client: HttpClient,
-    private val apiKey : String,
+    private val apiKey: String,
     private var baseUrl: String = "https://api.openweathermap.org/data/2.5/forecast",
 ) : KoinComponent {
 
@@ -19,7 +19,7 @@ class OpenWeatherApi(
         }
     }.body<WeatherResultVO>()
 
-    suspend fun fetchWeather(lat: Double, lon : Double) = client.get(baseUrl) {
+    suspend fun fetchWeather(lat: Double, lon: Double) = client.get(baseUrl) {
         url {
             parameters.append("lat", "$lat")
             parameters.append("lon", "$lon")

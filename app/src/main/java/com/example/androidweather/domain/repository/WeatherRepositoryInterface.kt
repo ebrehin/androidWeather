@@ -5,6 +5,6 @@ import com.example.androidweather.utils.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface WeatherRepositoryInterface {
-    suspend fun fetchWeather(city: String): Flow<Resource<WeatherResultModel?>>
-    suspend fun fetchWeather(lat: Double, lon: Double): Flow<Resource<WeatherResultModel?>>
+    fun fetchWeather(city: String): Flow<Resource<WeatherResultModel?>>
+    fun fetchWeather(lat: Double, lon: Double): Flow<Resource<WeatherResultModel?>>
 }

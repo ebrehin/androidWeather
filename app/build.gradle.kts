@@ -61,13 +61,13 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
 
-    // Koin pour Android
+    // Koin for Android
     implementation(libs.koin.core)
     implementation(libs.koin.android)
     implementation(libs.koin.test)
     implementation(libs.koin.androidx.compose)
 
-    // Ktor (Client HTTP & Sérialisation JSON)
+    /// Ktor
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.okhttp)
     implementation(libs.ktor.client.serialization.kotlinx)
@@ -78,11 +78,13 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
 
-    // Navigation Compose
+    // Navigation
     implementation(libs.compose.navigation)
 
-    // Location & Maps
+    // Location
     implementation(libs.play.service.location)
+
+    // Map
     implementation(libs.play.service.map)
     implementation(libs.compose.map)
 

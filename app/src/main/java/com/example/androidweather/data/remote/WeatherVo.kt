@@ -1,13 +1,9 @@
-package com.example.androidweather.data.api
+package com.example.androidweather.data.remote
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
 import kotlinx.serialization.Serializable
 
-@Entity(tableName = "WeatherResult")
 @Serializable
 data class WeatherResultVO(
-    @PrimaryKey(autoGenerate = true)
     val id: Int? = null,
     val city: WeatherCityVO? = null,
     val list: List<WeatherItemVO>? = listOf()
@@ -32,7 +28,16 @@ data class CoordinateVO(
 data class WeatherItemVO(
     val dt_txt: String,
     val dt: Float,
-    val main: WeatherInfoVo
+    val main: WeatherInfoVo,
+    val weather: List<WeatherConditionVO>? = listOf()
+)
+
+@Serializable
+data class WeatherConditionVO(
+    val id: Int? = null,
+    val main: String? = null,
+    val description: String? = null,
+    val icon: String? = null
 )
 
 @Serializable

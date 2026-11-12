@@ -22,7 +22,7 @@ data class CoordinateModel(
 
 data class WeatherItemModel(
     val date: LocalDateTime,
-    val image: String,
+    val weatherType: WeatherTypeEnum,
     val infos: WeatherInfoModel,
     var day: String? = null,
     var hour: String? = null

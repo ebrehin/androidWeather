@@ -1,1 +1,57 @@
-/build
+# Built application files
+*.apk
+*.aar
+*.aab
+*.ap_
+*.dex
+
+# Files for dex/class files
+bin/
+
+# Generate files
+bin/
+gen/
+out/
+.gradle/
+build/
+
+# Local configuration file (sdk.dir, etc.)
+local.properties
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.iml
+.name
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Profiling and capture files
+*.hprof
+*.prof
+
+# Captures of the Android UI Test Viewer
+captures/
+
+# External native build results
+.externalNativeBuild/
+.cxx/
+
+# Google Services / Firebase (décommentez si vous ne voulez pas versionner vos fichiers de configuration secrets)
+# google-services.json
+# google-cloud-key.json
+
+# Local unit test coverage data
+*.exec
+*.jacoco
+*.coverage

@@ -15,4 +15,4 @@ sealed class Resource<T>(
     class Loading<T>(data: T? = null) : Resource<T>(Status.LOADING, data)
     class Error<T>(throwable: Throwable, data: T? = null) :
         Resource<T>(Status.ERROR, data, throwable)
-} 
+}

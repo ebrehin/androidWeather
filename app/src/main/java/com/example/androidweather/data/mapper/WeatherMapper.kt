@@ -1,15 +1,16 @@
 package com.example.androidweather.data.mapper
 
-import com.example.androidweather.data.api.CoordinateVO
-import com.example.androidweather.data.api.WeatherCityVO
-import com.example.androidweather.data.api.WeatherInfoVo
-import com.example.androidweather.data.api.WeatherItemVO
-import com.example.androidweather.data.api.WeatherResultVO
+import com.example.androidweather.data.remote.CoordinateVO
+import com.example.androidweather.data.remote.WeatherCityVO
+import com.example.androidweather.data.remote.WeatherInfoVo
+import com.example.androidweather.data.remote.WeatherItemVO
+import com.example.androidweather.data.remote.WeatherResultVO
 import com.example.androidweather.domain.model.CoordinateModel
 import com.example.androidweather.domain.model.WeatherCityModel
 import com.example.androidweather.domain.model.WeatherInfoModel
 import com.example.androidweather.domain.model.WeatherItemModel
 import com.example.androidweather.domain.model.WeatherResultModel
+import com.example.androidweather.domain.model.WeatherTypeEnum
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -33,15 +34,20 @@ fun CoordinateVO.toModel() = CoordinateModel(
 
 fun WeatherItemVO.toModel() = WeatherItemModel(
     date = LocalDateTime.parse(this.dt_txt, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
-    image = when {
-        main.humidity < 60 -> "1"
-        main.humidity < 80 -> "2"
-        else -> "3"
-    },
+    weatherType = mapCodeToWeatherType(this.weather?.firstOrNull()?.icon),
     infos = this.main.toModel()
-).apply {
-    this.day = date.dayOfMonth.toString()
-    this.hour = date.hour.toString()
+)
+
+private fun mapCodeToWeatherType(code: String?): WeatherTypeEnum {
+    if (code == null) return WeatherTypeEnum.UNKNOWN
+    return when {
+        code.startsWith("01") -> WeatherTypeEnum.SUN
+        code.startsWith("02") || code.startsWith("03") || code.startsWith("04") || code.startsWith("50") -> WeatherTypeEnum.CLOUD
+        code.startsWith("09") || code.startsWith("10") -> WeatherTypeEnum.RAIN
+        code.startsWith("11") -> WeatherTypeEnum.THUNDERSTORM
+        code.startsWith("13") -> WeatherTypeEnum.SNOW
+        else -> WeatherTypeEnum.SUN
+    }
 }
 
 fun WeatherInfoVo.toModel() = WeatherInfoModel(

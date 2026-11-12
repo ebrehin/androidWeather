@@ -5,48 +5,99 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.androidweather.domain.model.WeatherCityModel
 import com.example.androidweather.domain.model.WeatherItemModel
-import com.example.androidweather.domain.repository.WeatherRepositoryInterface
+import com.example.androidweather.domain.model.WeatherResultModel
+import com.example.androidweather.domain.model.WeatherUiState
+import com.example.androidweather.domain.usecase.GetWeatherByCityUseCase
+import com.example.androidweather.domain.usecase.GetWeatherByLocationUseCase
+import com.example.androidweather.domain.usecase.GetWeatherForNext24HoursUseCase
+import com.example.androidweather.utils.Resource
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class WeatherViewModelState(
-    var city: WeatherCityModel? = null,
-    var first: WeatherItemModel? = null,
-    var items: List<WeatherItemModel> = emptyList(),
-    var isLoading: Boolean = false,
+    val city: WeatherCityModel? = null,
+    val first: WeatherItemModel? = null,
+    val items: List<WeatherItemModel> = emptyList(),
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null,
 )
 
-class WeatherViewModel(private val repository: WeatherRepositoryInterface) :
-    ViewModel() {
+class WeatherViewModel(
+    private val getWeatherByCityUseCase: GetWeatherByCityUseCase,
+    private val getWeatherByLocationUseCase: GetWeatherByLocationUseCase,
+    private val getWeatherForNext24HoursUseCase: GetWeatherForNext24HoursUseCase
+) : ViewModel() {
 
-    private val _viewState = MutableStateFlow<WeatherViewModelState>(WeatherViewModelState())
-    var viewState = _viewState.asStateFlow()
+    private val _viewState = MutableStateFlow(WeatherViewModelState())
+    val viewState: StateFlow<WeatherViewModelState> = _viewState.asStateFlow()
 
-    fun cityChanged(value: String) = fetchWeather(value)
+    private val _weatherState = MutableStateFlow(WeatherUiState())
+    val weatherState: StateFlow<WeatherUiState> = _weatherState.asStateFlow()
 
-    fun locationChanged(value: Location) = fetchWeather(value)
+    fun cityChanged(cityName: String) {
+        fetchWeather(cityName)
+    }
 
-    private fun fetchWeather(location: Location) = fetchWithFlow(null, location)
+    fun locationChanged(location: Location) {
+        observeWeatherFlow(getWeatherByLocationUseCase(location.latitude, location.longitude))
+    }
 
-    private fun fetchWeather(city: String) = fetchWithFlow(city)
-
-    private fun fetchWithFlow(city: String? = null, location: Location? = null) {
+    private fun observeWeatherFlow(flow: Flow<Resource<WeatherResultModel?>>) {
         viewModelScope.launch {
-            if (city != null) {
-                repository.fetchWeather(city).collect { resource ->
-                    _viewState.update{
-                        it.copy(city = resource.data?.city, items = resource.data?.items ?: emptyList())
+            flow.collect { resource ->
+                when (resource) {
+                    is Resource.Loading -> {
+                        _viewState.update { currentState ->
+                            currentState.copy(
+                                isLoading = true,
+                                errorMessage = null
+                            )
+                        }
+                    }
+
+                    is Resource.Success -> {
+                        val data = resource.data
+                        _viewState.update { currentState ->
+                            currentState.copy(
+                                isLoading = false,
+                                city = data?.city,
+                                items = data?.items ?: emptyList(),
+                                first = data?.items?.firstOrNull(),
+                                errorMessage = null
+                            )
+                        }
+                    }
+
+                    is Resource.Error -> {
+                        _viewState.update { currentState ->
+                            currentState.copy(
+                                isLoading = false,
+                                errorMessage = resource.error?.message ?: "Une erreur inconnue est survenue."
+                            )
+                        }
                     }
                 }
             }
-            else {
-                val flow = repository.fetchWeather(location!!.latitude, location.longitude).collect { resource ->
-                    _viewState.update{
-                        it.copy(city = resource.data?.city, items = resource.data?.items ?: emptyList())
-                    }
+        }
+    }
+
+    private fun fetchWeather(cityName: String) {
+        viewModelScope.launch {
+            getWeatherForNext24HoursUseCase(cityName).collect { resource ->
+                val isLoading = resource is Resource.Loading && resource.data == null
+                val errorMessage = when (resource) {
+                    is Resource.Error -> resource.error?.message ?: "Erreur de chargement de la météo."
+                    else -> null
                 }
+                _weatherState.value = mapToWeatherUiState(
+                    weatherResult = resource.data,
+                    isLoading = isLoading,
+                    errorMessage = errorMessage
+                )
             }
         }
     }
