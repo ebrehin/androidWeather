@@ -58,24 +58,32 @@ class HomeViewModel(
     }
 
     fun locationChanged(location: Location) {
+        coordinatesChanged(location.latitude, location.longitude)
+    }
+
+    private fun coordinatesChanged(lat: Double, lon: Double) {
         _weatherState.update {
-            it.copy(search = HomeUiState.SearchCriteria(lat = location.latitude, lon = location.longitude))
+            it.copy(search = HomeUiState.SearchCriteria(lat = lat, lon = lon))
         }
         viewModelScope.launch {
-            getWeatherForNext24HoursUseCase(
-                location.latitude,
-                location.longitude
-            ).collect { resource ->
+            getWeatherForNext24HoursUseCase(lat, lon).collect { resource ->
                 emitWeatherState(resource)
             }
         }
         viewModelScope.launch {
-            getDailyWeatherSummariesUseCase(
-                location.latitude,
-                location.longitude
-            ).collect { resource ->
+            getDailyWeatherSummariesUseCase(lat, lon).collect { resource ->
                 emitDailySummariesState(resource)
             }
+        }
+    }
+
+    fun refresh() {
+        val search = _weatherState.value.search
+        val lat = search.lat
+        val lon = search.lon
+        when {
+            search.city != null -> cityChanged(search.city)
+            lat != null && lon != null -> coordinatesChanged(lat, lon)
         }
     }
 

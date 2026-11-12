@@ -66,8 +66,17 @@ fun HomeScreen(onNavigateToDetail: (String, String, Double?, Double?) -> Unit) {
     }
 
     LaunchedEffect(Unit) {
+        if (weatherState.search != HomeUiState.SearchCriteria()) {
+            viewModel.refresh()
+            return@LaunchedEffect
+        }
+
         val permission = Manifest.permission.ACCESS_FINE_LOCATION
-        if (ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(
+                context,
+                permission
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
             viewModel.onPermissionGranted()
         } else {
             locationPermissionLauncher.launch(permission)

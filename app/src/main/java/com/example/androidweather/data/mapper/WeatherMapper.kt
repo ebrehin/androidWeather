@@ -38,7 +38,7 @@ fun WeatherItemVO.toModel() = WeatherItemModel(
     infos = this.main.toModel()
 )
 
-private fun mapCodeToWeatherType(code: String?): WeatherTypeEnum {
+internal fun mapCodeToWeatherType(code: String?): WeatherTypeEnum {
     if (code == null) return WeatherTypeEnum.UNKNOWN
     return when {
         code.startsWith("01") -> WeatherTypeEnum.SUN

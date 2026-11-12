@@ -20,6 +20,9 @@ import kotlinx.coroutines.SupervisorJob
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import androidx.room.Room
+import com.example.androidweather.data.local.WeatherDatabase
+import org.koin.android.ext.koin.androidContext
 
 val appModule = module {
     // Configuration API et client HTTP
@@ -30,11 +33,19 @@ val appModule = module {
     single { CoroutineScope(Dispatchers.Default + SupervisorJob()) }
     single { OpenWeatherApi(get(), get(named("weather_api_key"))) }
 
+    // Couche Data : base locale Room (cache)
+    single {
+        Room.databaseBuilder(androidContext(), WeatherDatabase::class.java, "weather.db")
+            .fallbackToDestructiveMigration(true) // le cache est jetable : en cas de changement de schéma, on le recrée
+            .build()
+    }
+    single { get<WeatherDatabase>().weatherDao() }
+
+    // Couche Data : repository
+    single<WeatherRepositoryInterface> { WeatherRepository(get(), get()) }
+
     // Couche Utils
     single { LocationTracker(get()) }
-
-    // Couche Data (Repository)
-    single<WeatherRepositoryInterface> { WeatherRepository(get()) }
 
     // Couche Domain (Use Cases)
     single { GetWeatherForNext24HoursUseCase(get()) }
