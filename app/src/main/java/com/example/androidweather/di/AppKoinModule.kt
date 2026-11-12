@@ -5,10 +5,10 @@ import com.example.androidweather.data.remote.createHttpClient
 import com.example.androidweather.data.remote.createJson
 import com.example.androidweather.data.repository.WeatherRepository
 import com.example.androidweather.domain.repository.WeatherRepositoryInterface
-import com.example.androidweather.domain.usecase.GetWeatherByCityUseCase
-import com.example.androidweather.domain.usecase.GetWeatherByLocationUseCase
 import com.example.androidweather.domain.usecase.GetWeatherForNext24HoursUseCase
+import com.example.androidweather.domain.usecase.GetWeatherForNextFiveDaysUseCase
 import com.example.androidweather.presentation.WeatherViewModel
+import com.example.androidweather.utils.LocationTracker
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.okhttp.OkHttp
 import kotlinx.coroutines.CoroutineScope
@@ -27,20 +27,22 @@ val appModule = module {
     single { CoroutineScope(Dispatchers.Default + SupervisorJob()) }
     single { OpenWeatherApi(get(), get(named("weather_api_key"))) }
 
+    // Couche Utils
+    single { LocationTracker(get()) }
+
     // Couche Data (Repository)
     single<WeatherRepositoryInterface> { WeatherRepository(get()) }
 
     // Couche Domain (Use Cases)
-    single { GetWeatherByCityUseCase(get()) }
-    single { GetWeatherByLocationUseCase(get()) }
     single { GetWeatherForNext24HoursUseCase(get()) }
+    single { GetWeatherForNextFiveDaysUseCase(get()) }
 
     // Couche Presentation (ViewModel)
     viewModel { 
         WeatherViewModel(
-            getWeatherByCityUseCase = get(),
-            getWeatherByLocationUseCase = get(),
-            getWeatherForNext24HoursUseCase = get()
+            getWeatherForNext24HoursUseCase = get(),
+            getWeatherForNextFiveDaysUseCase = get(),
+            locationTracker = get()
         ) 
     }
 }

@@ -1,11 +1,15 @@
 package com.example.androidweather.presentation
 
 import com.example.androidweather.domain.model.*
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 fun mapToWeatherUiState(
     weatherResult: WeatherResultModel?,
     isLoading: Boolean,
     errorMessage: String?,
+    dailyItems: List<DailyItemUiState> = emptyList(),
+    dailyLoading: Boolean = false,
 ): WeatherUiState {
     val city = weatherResult?.city
     val items = weatherResult?.items ?: emptyList()
@@ -39,6 +43,19 @@ fun mapToWeatherUiState(
         isLoading = isLoading,
         errorMessage = errorMessage,
         currentWeather = currentWeather,
-        hourlyForecast = HourlyForecastUiState(items = hourlyItems)
+        hourlyForecast = HourlyForecastUiState(items = hourlyItems),
+        dailyForecast = DailyForecastUiState(items = dailyItems, isLoading = dailyLoading)
     )
+}
+
+fun mapToDailyItems(items: List<com.example.androidweather.domain.model.DailyWeatherModel>): List<DailyItemUiState> {
+    val formatter = DateTimeFormatter.ofPattern("EEEE d MMM", Locale.FRENCH)
+    return items.map { item ->
+        DailyItemUiState(
+            dayText = item.date.format(formatter),
+            weatherType = item.weatherType,
+            minTemperatureText = "Min ${item.minTemperature.toInt()}°C",
+            maxTemperatureText = "Max ${item.maxTemperature.toInt()}°C"
+        )
+    }
 }

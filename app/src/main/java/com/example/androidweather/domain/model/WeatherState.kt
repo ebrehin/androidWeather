@@ -4,7 +4,8 @@ data class WeatherUiState(
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
     val currentWeather: CurrentWeatherUiState? = null,
-    val hourlyForecast: HourlyForecastUiState = HourlyForecastUiState()
+    val hourlyForecast: HourlyForecastUiState = HourlyForecastUiState(),
+    val dailyForecast: DailyForecastUiState = DailyForecastUiState()
 )
 
 data class CurrentWeatherUiState(
@@ -25,4 +26,16 @@ data class HourlyItemUiState(
     val humidityText: String,
     val tempText: String,
     val isSelected: Boolean
+)
+
+data class DailyForecastUiState(
+    val items: List<DailyItemUiState> = emptyList(),
+    val isLoading: Boolean = false
+)
+
+data class DailyItemUiState(
+    val dayText: String,
+    val weatherType: WeatherTypeEnum,
+    val minTemperatureText: String,
+    val maxTemperatureText: String
 )

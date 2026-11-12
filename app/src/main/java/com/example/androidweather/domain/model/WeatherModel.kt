@@ -1,5 +1,6 @@
 package com.example.androidweather.domain.model
 
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class WeatherResultModel(
@@ -26,6 +27,13 @@ data class WeatherItemModel(
     val infos: WeatherInfoModel,
     var day: String? = null,
     var hour: String? = null
+)
+
+data class DailyWeatherModel(
+    val date: LocalDate,
+    val weatherType: WeatherTypeEnum,
+    val minTemperature: Double,
+    val maxTemperature: Double
 )
 
 data class WeatherInfoModel(

@@ -3,6 +3,7 @@ package com.example.androidweather.presentation.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -98,6 +99,48 @@ fun WeatherSummaryCard(
             Text(modifier = Modifier.padding(top = 10.dp), fontWeight = FontWeight.Bold, text = title)
             Text(text = temp)
             Text(text = humidity)
+        }
+    }
+}
+
+
+
+@Composable
+fun DailyWeatherCard(
+    modifier: Modifier = Modifier,
+    day: String,
+    minTemperature: String,
+    maxTemperature: String,
+    weatherType: WeatherTypeEnum,
+) {
+    Card(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(start = 16.dp)
+                    .fillMaxHeight(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    Text(fontWeight = FontWeight.Bold, fontSize = 30.sp, text = day)
+                    Text(fontWeight = FontWeight.Bold, fontSize = 20.sp, text = minTemperature)
+                }
+                Text(fontWeight = FontWeight.Bold, fontSize = 20.sp, text = maxTemperature)
+            }
+            WeatherAnimation(
+                weatherType = weatherType,
+                modifier = Modifier.size(120.dp)
+            )
         }
     }
 }
