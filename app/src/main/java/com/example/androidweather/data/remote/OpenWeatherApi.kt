@@ -13,7 +13,7 @@ class OpenWeatherApi(
 
     suspend fun fetchWeather(city: String) = client.get(baseUrl) {
         url {
-            parameters.append("q", "$city, FR")
+            parameters.append("q", city)
             parameters.append("APPID", apiKey)
             parameters.append("units", "metric")
         }

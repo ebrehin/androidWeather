@@ -1,9 +1,10 @@
-package com.example.androidweather.presentation
+package com.example.androidweather.presentation.screen.home
 
 import android.Manifest
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -38,6 +39,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import com.example.androidweather.presentation.components.ErrorCard
 import com.example.androidweather.presentation.components.WeatherDetailCard
 import com.example.androidweather.presentation.components.DailyWeatherCard
 import com.example.androidweather.presentation.components.WeatherSummaryCard
@@ -45,8 +47,8 @@ import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WeatherList() {
-    val viewModel = koinViewModel<WeatherViewModel>()
+fun HomeScreen(onNavigateToDetail: (String, String, Double?, Double?) -> Unit) {
+    val viewModel = koinViewModel<HomeViewModel>()
     val weatherState by viewModel.weatherState.collectAsState()
     var cityName by rememberSaveable { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -64,8 +66,17 @@ fun WeatherList() {
     }
 
     LaunchedEffect(Unit) {
+        if (weatherState.search != HomeUiState.SearchCriteria()) {
+            viewModel.refresh()
+            return@LaunchedEffect
+        }
+
         val permission = Manifest.permission.ACCESS_FINE_LOCATION
-        if (ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(
+                context,
+                permission
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
             viewModel.onPermissionGranted()
         } else {
             locationPermissionLauncher.launch(permission)
@@ -168,7 +179,7 @@ fun WeatherList() {
                             title = item.hourText,
                             temp = item.tempText,
                             humidity = item.humidityText,
-                            weatherType = item.weatherType
+                            weatherType = item.weatherType,
                         )
                     }
 
@@ -177,12 +188,17 @@ fun WeatherList() {
                         text = "Prévisions sur 5 jours :"
                     )
 
-                    if (weatherState.dailyForecast.isLoading) {
+                    when {
+                        weatherState.dailyForecast.isLoading -> {
                         Text(
                             modifier = Modifier.padding(horizontal = 16.dp),
                             text = "Chargement des prévisions journalières..."
                         )
-                    } else {
+                        }
+                        weatherState.dailyForecast.errorMessage != null -> {
+                            ErrorCard(message = weatherState.dailyForecast.errorMessage!!)
+                        }
+                        else -> {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -195,9 +211,19 @@ fun WeatherList() {
                                     day = item.dayText,
                                     minTemperature = item.minTemperatureText,
                                     maxTemperature = item.maxTemperatureText,
-                                    weatherType = item.weatherType
+                                    weatherType = item.weatherType,
+                                    onClick = {
+                                        val search = weatherState.search
+                                        onNavigateToDetail(
+                                            search.city.orEmpty(),
+                                            item.dateString,
+                                            search.lat,
+                                            search.lon
+                                        )
+                                    }
                                 )
                             }
+                        }
                         }
                     }
                 }

@@ -29,11 +29,11 @@ data class WeatherItemModel(
     var hour: String? = null
 )
 
-data class DailyWeatherModel(
+data class DailyWeatherSummaryModel(
     val date: LocalDate,
     val weatherType: WeatherTypeEnum,
-    val minTemperature: Double,
-    val maxTemperature: Double
+    val minTemp: Double,
+    val maxTemp: Double
 )
 
 data class WeatherInfoModel(

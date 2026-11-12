@@ -5,9 +5,12 @@ import com.example.androidweather.data.remote.createHttpClient
 import com.example.androidweather.data.remote.createJson
 import com.example.androidweather.data.repository.WeatherRepository
 import com.example.androidweather.domain.repository.WeatherRepositoryInterface
+import com.example.androidweather.domain.usecase.GetDailyWeatherSummariesUseCase
+import com.example.androidweather.domain.usecase.GetWeatherByDateUseCase
 import com.example.androidweather.domain.usecase.GetWeatherForNext24HoursUseCase
-import com.example.androidweather.domain.usecase.GetWeatherForNextFiveDaysUseCase
-import com.example.androidweather.presentation.WeatherViewModel
+import com.example.androidweather.presentation.screen.detail.DetailViewModel
+import androidx.lifecycle.SavedStateHandle
+import com.example.androidweather.presentation.screen.home.HomeViewModel
 import com.example.androidweather.utils.LocationTracker
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.okhttp.OkHttp
@@ -17,6 +20,9 @@ import kotlinx.coroutines.SupervisorJob
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import androidx.room.Room
+import com.example.androidweather.data.local.WeatherDatabase
+import org.koin.android.ext.koin.androidContext
 
 val appModule = module {
     // Configuration API et client HTTP
@@ -27,22 +33,38 @@ val appModule = module {
     single { CoroutineScope(Dispatchers.Default + SupervisorJob()) }
     single { OpenWeatherApi(get(), get(named("weather_api_key"))) }
 
+    // Couche Data : base locale Room (cache)
+    single {
+        Room.databaseBuilder(androidContext(), WeatherDatabase::class.java, "weather.db")
+            .fallbackToDestructiveMigration(true) // le cache est jetable : en cas de changement de schéma, on le recrée
+            .build()
+    }
+    single { get<WeatherDatabase>().weatherDao() }
+
+    // Couche Data : repository
+    single<WeatherRepositoryInterface> { WeatherRepository(get(), get()) }
+
     // Couche Utils
     single { LocationTracker(get()) }
 
-    // Couche Data (Repository)
-    single<WeatherRepositoryInterface> { WeatherRepository(get()) }
-
     // Couche Domain (Use Cases)
     single { GetWeatherForNext24HoursUseCase(get()) }
-    single { GetWeatherForNextFiveDaysUseCase(get()) }
+    single { GetDailyWeatherSummariesUseCase(get()) }
+    single { GetWeatherByDateUseCase(get()) }
 
     // Couche Presentation (ViewModel)
     viewModel { 
-        WeatherViewModel(
+        HomeViewModel(
             getWeatherForNext24HoursUseCase = get(),
-            getWeatherForNextFiveDaysUseCase = get(),
+            getDailyWeatherSummariesUseCase = get(),
             locationTracker = get()
         ) 
+    }
+
+    viewModel { (handle: SavedStateHandle) ->
+        DetailViewModel(
+            savedStateHandle = handle,
+            getWeatherByDateUseCase = get()
+        )
     }
 }
