@@ -77,35 +77,6 @@ fun WeatherDetailCard(
 }
 
 @Composable
-fun WeatherSummaryCard(
-    modifier: Modifier = Modifier,
-    title: String,
-    temp: String,
-    humidity: String,
-    weatherType: WeatherTypeEnum,
-) {
-    Card(
-        modifier = modifier,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
-    ){
-        Column(
-            modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 12.dp, end = 12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            WeatherAnimation(
-                weatherType = weatherType,
-                modifier = Modifier.size(56.dp)
-            )
-            Text(modifier = Modifier.padding(top = 10.dp), fontWeight = FontWeight.Bold, text = title)
-            Text(text = temp)
-            Text(text = humidity)
-        }
-    }
-}
-
-
-
-@Composable
 fun DailyWeatherCard(
     modifier: Modifier = Modifier,
     day: String,

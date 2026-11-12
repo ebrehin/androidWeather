@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">AndroidWeather</string>
+    <string name="weather_title">Météo</string>
+    <string name="search_description">Rechercher une ville</string>
+    <string name="search_placeholder">Nom de la ville</string>
+    <string name="clear_description">Effacer la recherche</string>
+    <string name="next_24_hours">Prévisions sur 24 heures</string>
+    <string name="five_day_forecast">Prévisions sur 5 jours</string>
 </resources>

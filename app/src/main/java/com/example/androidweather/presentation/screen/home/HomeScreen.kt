@@ -38,15 +38,17 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import com.example.androidweather.presentation.components.ErrorCard
 import com.example.androidweather.presentation.components.WeatherDetailCard
 import com.example.androidweather.presentation.components.DailyWeatherCard
 import com.example.androidweather.presentation.components.WeatherSummaryCard
+import com.example.androidweather.presentation.screen.home.HomeViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WeatherList() {
-    val viewModel = koinViewModel<WeatherViewModel>()
+fun HomeScreen() {
+    val viewModel = koinViewModel<HomeViewModel>()
     val weatherState by viewModel.weatherState.collectAsState()
     var cityName by rememberSaveable { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -177,12 +179,17 @@ fun WeatherList() {
                         text = "Prévisions sur 5 jours :"
                     )
 
-                    if (weatherState.dailyForecast.isLoading) {
+                    when {
+                        weatherState.dailyForecast.isLoading -> {
                         Text(
                             modifier = Modifier.padding(horizontal = 16.dp),
                             text = "Chargement des prévisions journalières..."
                         )
-                    } else {
+                        }
+                        weatherState.dailyForecast.errorMessage != null -> {
+                            ErrorCard(message = weatherState.dailyForecast.errorMessage!!)
+                        }
+                        else -> {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -198,6 +205,7 @@ fun WeatherList() {
                                     weatherType = item.weatherType
                                 )
                             }
+                        }
                         }
                     }
                 }

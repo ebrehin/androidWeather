@@ -5,9 +5,9 @@ import com.example.androidweather.data.remote.createHttpClient
 import com.example.androidweather.data.remote.createJson
 import com.example.androidweather.data.repository.WeatherRepository
 import com.example.androidweather.domain.repository.WeatherRepositoryInterface
+import com.example.androidweather.domain.usecase.GetDailyWeatherSummariesUseCase
 import com.example.androidweather.domain.usecase.GetWeatherForNext24HoursUseCase
-import com.example.androidweather.domain.usecase.GetWeatherForNextFiveDaysUseCase
-import com.example.androidweather.presentation.WeatherViewModel
+import com.example.androidweather.presentation.screen.home.HomeViewModel
 import com.example.androidweather.utils.LocationTracker
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.okhttp.OkHttp
@@ -35,13 +35,13 @@ val appModule = module {
 
     // Couche Domain (Use Cases)
     single { GetWeatherForNext24HoursUseCase(get()) }
-    single { GetWeatherForNextFiveDaysUseCase(get()) }
+    single { GetDailyWeatherSummariesUseCase(get()) }
 
     // Couche Presentation (ViewModel)
     viewModel { 
-        WeatherViewModel(
+        HomeViewModel(
             getWeatherForNext24HoursUseCase = get(),
-            getWeatherForNextFiveDaysUseCase = get(),
+            getDailyWeatherSummariesUseCase = get(),
             locationTracker = get()
         ) 
     }
