@@ -1,4 +1,4 @@
-package com.example.androidweather.presentation
+package com.example.androidweather.presentation.screen.home
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -42,7 +42,6 @@ import com.example.androidweather.presentation.components.ErrorCard
 import com.example.androidweather.presentation.components.WeatherDetailCard
 import com.example.androidweather.presentation.components.DailyWeatherCard
 import com.example.androidweather.presentation.components.WeatherSummaryCard
-import com.example.androidweather.presentation.screen.home.HomeViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
