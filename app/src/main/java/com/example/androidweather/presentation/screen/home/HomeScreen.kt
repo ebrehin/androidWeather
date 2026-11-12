@@ -46,7 +46,7 @@ import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(onNavigateToDetail: (String, String, Double?, Double?) -> Unit) {
     val viewModel = koinViewModel<HomeViewModel>()
     val weatherState by viewModel.weatherState.collectAsState()
     var cityName by rememberSaveable { mutableStateOf("") }
