@@ -6,4 +6,7 @@
     <string name="clear_description">Effacer la recherche</string>
     <string name="next_24_hours">Prévisions sur 24 heures</string>
     <string name="five_day_forecast">Prévisions sur 5 jours</string>
+    <string name="back_description">Retour</string>
+    <string name="daily_hours">Prévisions heure par heure</string>
+    <string name="no_data_for_date">Aucune donnée disponible pour cette date</string>
 </resources>

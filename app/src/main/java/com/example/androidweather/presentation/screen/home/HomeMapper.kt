@@ -49,6 +49,7 @@ fun mapToDailyForecastUiState(
     val dailyItems = dailySummaries.map { summary ->
         val dayName = summary.date.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.FRENCH)
         DailyItemUiState(
+            dateString = summary.date.toString(),
             dayText = "$dayName ${summary.date.dayOfMonth}",
             weatherType = summary.weatherType,
             minTemperatureText = "Min:${summary.minTemp.toInt()}°",

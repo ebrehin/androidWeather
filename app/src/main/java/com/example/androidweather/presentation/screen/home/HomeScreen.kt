@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -169,7 +170,7 @@ fun HomeScreen(onNavigateToDetail: (String, String, Double?, Double?) -> Unit) {
                             title = item.hourText,
                             temp = item.tempText,
                             humidity = item.humidityText,
-                            weatherType = item.weatherType
+                            weatherType = item.weatherType,
                         )
                     }
 
@@ -201,7 +202,16 @@ fun HomeScreen(onNavigateToDetail: (String, String, Double?, Double?) -> Unit) {
                                     day = item.dayText,
                                     minTemperature = item.minTemperatureText,
                                     maxTemperature = item.maxTemperatureText,
-                                    weatherType = item.weatherType
+                                    weatherType = item.weatherType,
+                                    onClick = {
+                                        val search = weatherState.search
+                                        onNavigateToDetail(
+                                            search.city.orEmpty(),
+                                            item.dateString,
+                                            search.lat,
+                                            search.lon
+                                        )
+                                    }
                                 )
                             }
                         }

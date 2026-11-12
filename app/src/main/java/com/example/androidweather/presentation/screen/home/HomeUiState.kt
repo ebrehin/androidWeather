@@ -7,8 +7,15 @@ data class HomeUiState(
     val errorMessage: String? = null,
     val currentWeather: CurrentWeather? = null,
     val hourlyForecast: HourlyForecast = HourlyForecast(),
-    val dailyForecast: DailyForecastUiState = DailyForecastUiState()
+    val dailyForecast: DailyForecastUiState = DailyForecastUiState(),
+    val search: SearchCriteria = SearchCriteria()
 ) {
+    data class SearchCriteria(
+        val city: String? = null,
+        val lat: Double? = null,
+        val lon: Double? = null
+    )
+
     data class CurrentWeather(
         val cityName: String,
         val temperatureText: String,
@@ -30,20 +37,6 @@ data class HomeUiState(
     )
 }
 
-data class DailyUiState(
-    val isLoading: Boolean = true,
-    val errorMessage: String? = null,
-    val summaries: List<Summary> = emptyList()
-) {
-    data class Summary(
-        val dateString: String,
-        val dayName: String,
-        val weatherType: WeatherTypeEnum,
-        val minTempText: String,
-        val maxTempText: String,
-    )
-}
-
 data class DailyForecastUiState(
     val items: List<DailyItemUiState> = emptyList(),
     val isLoading: Boolean = false,
@@ -51,6 +44,7 @@ data class DailyForecastUiState(
 )
 
 data class DailyItemUiState(
+    val dateString: String,
     val dayText: String,
     val weatherType: WeatherTypeEnum,
     val minTemperatureText: String,

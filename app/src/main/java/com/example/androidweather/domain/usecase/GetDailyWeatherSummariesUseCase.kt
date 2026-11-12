@@ -5,6 +5,7 @@ import com.example.androidweather.domain.model.WeatherItemModel
 import com.example.androidweather.domain.model.WeatherResultModel
 import com.example.androidweather.domain.repository.WeatherRepositoryInterface
 import com.example.androidweather.utils.Resource
+import com.example.androidweather.utils.calculateDominantWeatherType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
@@ -42,10 +43,7 @@ class GetDailyWeatherSummariesUseCase(
             .map { (date, dayItems) ->
                 DailyWeatherSummaryModel(
                     date = date,
-                    weatherType = dayItems.groupingBy { it.weatherType }
-                        .eachCount()
-                        .maxBy { it.value }
-                        .key,
+                    weatherType = dayItems.calculateDominantWeatherType(),
                     minTemp = dayItems.minOf { it.infos.temp },
                     maxTemp = dayItems.maxOf { it.infos.temp }
                 )

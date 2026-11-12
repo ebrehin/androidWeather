@@ -44,6 +44,7 @@ class HomeViewModel(
     }
 
     fun cityChanged(cityName: String) {
+        _weatherState.update { it.copy(search = HomeUiState.SearchCriteria(city = cityName)) }
         viewModelScope.launch {
             getWeatherForNext24HoursUseCase(cityName).collect { resource ->
                 emitWeatherState(resource)
@@ -57,6 +58,9 @@ class HomeViewModel(
     }
 
     fun locationChanged(location: Location) {
+        _weatherState.update {
+            it.copy(search = HomeUiState.SearchCriteria(lat = location.latitude, lon = location.longitude))
+        }
         viewModelScope.launch {
             getWeatherForNext24HoursUseCase(
                 location.latitude,
@@ -84,9 +88,11 @@ class HomeViewModel(
             }
 
             is Resource.Success -> {
-                val mappedState = mapToHomeUiState(resource.data)
                 _weatherState.update { state ->
-                    mappedState.copy(dailyForecast = state.dailyForecast)
+                    mapToHomeUiState(resource.data).copy(
+                        dailyForecast = state.dailyForecast,
+                        search = state.search
+                    )
                 }
             }
 

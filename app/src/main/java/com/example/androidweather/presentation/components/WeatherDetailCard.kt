@@ -1,5 +1,6 @@
 package com.example.androidweather.presentation.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,7 +13,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -83,6 +83,7 @@ fun DailyWeatherCard(
     minTemperature: String,
     maxTemperature: String,
     weatherType: WeatherTypeEnum,
+    onClick: () -> Unit,
 ) {
     Card(
         modifier = modifier,
@@ -93,7 +94,8 @@ fun DailyWeatherCard(
         Row(
             modifier = Modifier
                 .padding(16.dp)
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .clickable { onClick() },
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column(
