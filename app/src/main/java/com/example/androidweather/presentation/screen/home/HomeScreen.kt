@@ -114,11 +114,10 @@ fun HomeScreen(
                         }
                         else -> {
                             weatherState.currentWeather?.let { currentWeather ->
-                                Text(text = "Météo " + currentWeather.cityName)
+                                Text(text = stringResource(R.string.weather_title) + currentWeather.cityName)
                             }
                         }
                     }
-                    Text(stringResource(R.string.weather_title))
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateToSettings) {
