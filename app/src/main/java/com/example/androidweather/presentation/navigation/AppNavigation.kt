@@ -9,6 +9,7 @@ import com.example.androidweather.presentation.screen.detail.DetailScreen
 import com.example.androidweather.presentation.screen.favorites.FavoritesScreen
 import com.example.androidweather.presentation.screen.home.HomeScreen
 import kotlinx.serialization.Serializable
+import com.example.androidweather.presentation.screen.settings.SettingsScreen
 
 sealed interface Screen {
     @Serializable
@@ -16,6 +17,9 @@ sealed interface Screen {
 
     @Serializable
     data object Favorites : Screen
+
+    @Serializable
+    data object Settings : Screen
 
     @Serializable
     data class Detail(
@@ -37,6 +41,7 @@ fun AppNavigation(
         composable<Screen.Home> {
             HomeScreen(
                 onNavigateToFavorites = { navController.navigate(Screen.Favorites) },
+                onNavigateToSettings = { navController.navigate(Screen.Settings) },   // nouveau
                 onNavigateToDetail = { cityName, dateString, lat, lon ->
                     navController.navigate(Screen.Detail(cityName, dateString, lat, lon))
                 }
@@ -49,6 +54,12 @@ fun AppNavigation(
                 onCityClick = { cityName ->
                     navController.navigate(Screen.Home(cityName))
                 }
+            )
+        }
+
+        composable<Screen.Settings> {
+            SettingsScreen(
+                onBackClick = { navController.popBackStack() }
             )
         }
 

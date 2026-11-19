@@ -49,11 +49,13 @@ import com.example.androidweather.presentation.components.WeatherDetailCard
 import com.example.androidweather.presentation.components.DailyWeatherCard
 import com.example.androidweather.presentation.components.WeatherSummaryCard
 import org.koin.androidx.compose.koinViewModel
+import androidx.compose.material.icons.filled.Settings
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     onNavigateToFavorites: () -> Unit,
+    onNavigateToSettings: () -> Unit,
     onNavigateToDetail: (String, String, Double?, Double?) -> Unit
 ) {
     val viewModel = koinViewModel<HomeViewModel>()
@@ -115,6 +117,15 @@ fun HomeScreen(
                                 Text(text = "Météo " + currentWeather.cityName)
                             }
                         }
+                    }
+                    Text(stringResource(R.string.weather_title))
+                },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateToSettings) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = stringResource(R.string.settings_description)
+                        )
                     }
                 },
                 actions = {

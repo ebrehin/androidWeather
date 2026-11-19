@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <style name="Theme.AndroidWeather" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <!-- Thème du splash screen : affiché au lancement, puis remplacé par Theme.AndroidWeather -->
+    <style name="Theme.AndroidWeather.Splash" parent="Theme.SplashScreen">
+        <item name="postSplashScreenTheme">@style/Theme.AndroidWeather</item>
+    </style>
 </resources>

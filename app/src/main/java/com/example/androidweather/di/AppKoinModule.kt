@@ -30,6 +30,13 @@ import com.example.androidweather.domain.usecase.GetFavoriteCitiesUseCase
 import com.example.androidweather.domain.usecase.IsCityFavoriteUseCase
 import com.example.androidweather.domain.usecase.RemoveFavoriteCityUseCase
 import com.example.androidweather.presentation.screen.favorites.FavoritesViewModel
+import com.example.androidweather.data.local.settingsDataStore
+import com.example.androidweather.data.repository.SettingsRepository
+import com.example.androidweather.domain.repository.SettingsRepositoryInterface
+import com.example.androidweather.domain.usecase.ObserveThemeModeUseCase
+import com.example.androidweather.domain.usecase.SetThemeModeUseCase
+import com.example.androidweather.presentation.MainViewModel
+import com.example.androidweather.presentation.screen.settings.SettingsViewModel
 
 val appModule = module {
     // Configuration API et client HTTP
@@ -43,6 +50,7 @@ val appModule = module {
     // Couche Data : base locale Room
     single { get<WeatherDatabase>().weatherDao() }
     single { get<WeatherDatabase>().favoriteDao() }
+
     // Couche Data : base locale Room (cache)
     single {
         Room.databaseBuilder(androidContext(), WeatherDatabase::class.java, "weather.db")
@@ -51,9 +59,13 @@ val appModule = module {
     }
     single { get<WeatherDatabase>().weatherDao() }
 
+    // Couche Data : préférences utilisateur (DataStore)
+    single { androidContext().settingsDataStore }
+
     // Couche Data : repository
     single<WeatherRepositoryInterface> { WeatherRepository(get(), get()) }
     single<FavoriteRepositoryInterface> { FavoriteRepository(get()) }
+    single<SettingsRepositoryInterface> { SettingsRepository(get()) }
 
     // Couche Utils
     single { LocationTracker(get()) }
@@ -66,6 +78,8 @@ val appModule = module {
     single { AddFavoriteCityUseCase(get()) }
     single { RemoveFavoriteCityUseCase(get()) }
     single { IsCityFavoriteUseCase(get()) }
+    single { ObserveThemeModeUseCase(get()) }
+    single { SetThemeModeUseCase(get()) }
 
     // Couche Presentation (ViewModel)
     viewModel { (handle: SavedStateHandle) ->
@@ -91,6 +105,19 @@ val appModule = module {
         FavoritesViewModel(
             getFavoriteCitiesUseCase = get(),
             removeFavoriteCityUseCase = get()
+        )
+    }
+
+    viewModel {
+        MainViewModel(
+            observeThemeModeUseCase = get()
+        )
+    }
+
+    viewModel {
+        SettingsViewModel(
+            observeThemeModeUseCase = get(),
+            setThemeModeUseCase = get()
         )
     }
 }
