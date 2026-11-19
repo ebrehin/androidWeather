@@ -6,12 +6,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.androidweather.presentation.screen.detail.DetailScreen
+import com.example.androidweather.presentation.screen.favorites.FavoritesScreen
 import com.example.androidweather.presentation.screen.home.HomeScreen
 import kotlinx.serialization.Serializable
 
 sealed interface Screen {
     @Serializable
-    data object Home : Screen
+    data class Home(val cityName: String? = null) : Screen
+
+    @Serializable
+    data object Favorites : Screen
 
     @Serializable
     data class Detail(
@@ -28,12 +32,22 @@ fun AppNavigation(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Home
+        startDestination = Screen.Home()
     ) {
         composable<Screen.Home> {
             HomeScreen(
+                onNavigateToFavorites = { navController.navigate(Screen.Favorites) },
                 onNavigateToDetail = { cityName, dateString, lat, lon ->
                     navController.navigate(Screen.Detail(cityName, dateString, lat, lon))
+                }
+            )
+        }
+
+        composable<Screen.Favorites> {
+            FavoritesScreen(
+                onBackClick = { navController.popBackStack() },
+                onCityClick = { cityName ->
+                    navController.navigate(Screen.Home(cityName))
                 }
             )
         }

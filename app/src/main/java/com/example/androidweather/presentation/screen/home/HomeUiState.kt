@@ -8,7 +8,8 @@ data class HomeUiState(
     val currentWeather: CurrentWeather? = null,
     val hourlyForecast: HourlyForecast = HourlyForecast(),
     val dailyForecast: DailyForecastUiState = DailyForecastUiState(),
-    val search: SearchCriteria = SearchCriteria()
+    val search: SearchCriteria = SearchCriteria(),
+    val isFavorite: Boolean = false
 ) {
     data class SearchCriteria(
         val city: String? = null,

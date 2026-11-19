@@ -18,6 +18,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.androidweather.domain.model.WeatherTypeEnum
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material3.IconButton
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.stringResource
+import com.example.androidweather.R
+import androidx.compose.ui.graphics.Color
 
 @Composable
 fun WeatherDetailCard(
@@ -26,6 +40,8 @@ fun WeatherDetailCard(
     temp: String,
     weatherType: WeatherTypeEnum,
     humidity: String? = null,
+    isFavorite: Boolean = false,
+    onFavoriteClick: () -> Unit = {},
 ) {
     Card(
         modifier = modifier,
@@ -35,11 +51,16 @@ fun WeatherDetailCard(
     ) {
         Row(
             modifier = Modifier
-              .padding(16.dp)
-              .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+                .fillMaxWidth()
+                .height(IntrinsicSize.Max)       // la Row prend la hauteur de son contenu le plus grand
+                .padding(20.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(modifier = Modifier.padding(start = 16.dp)) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                modifier = Modifier.weight(2f)   // était weight(1f) : le texte prend 2/3 de la largeur
+            ) {
                 Text(fontWeight = FontWeight.Bold, fontSize = 24.sp, text = city)
                 Text(fontWeight = FontWeight.Bold, fontSize = 42.sp, text = temp)
                 var typeText = ""
@@ -68,10 +89,34 @@ fun WeatherDetailCard(
                 Text(fontWeight = FontWeight.Bold, fontSize = 20.sp, text = typeText)
                 humidity?.let { Text(fontWeight = FontWeight.Bold, fontSize = 20.sp, text = it) }
             }
-            WeatherAnimation(
-                weatherType = weatherType,
-                modifier = Modifier.size(120.dp)
-            )
+            Column(
+                horizontalAlignment = Alignment.End,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+            ) {
+                IconButton(
+                    onClick = onFavoriteClick,
+                    modifier = Modifier.padding(bottom = 6.dp)
+                ) {
+                    Icon(
+                        imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                        contentDescription = stringResource(R.string.add_favorite_description),
+                        tint = Color.Red
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    WeatherLottieAnimation(
+                        weatherType = weatherType,
+                        modifier = Modifier.size(120.dp)
+                    )
+                }
+            }
         }
     }
 }

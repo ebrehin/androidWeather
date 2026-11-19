@@ -14,13 +14,24 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import androidx.lifecycle.SavedStateHandle
+import androidx.navigation.toRoute
+import com.example.androidweather.presentation.navigation.Screen
+import com.example.androidweather.domain.usecase.AddFavoriteCityUseCase
+import com.example.androidweather.domain.usecase.IsCityFavoriteUseCase
+import com.example.androidweather.domain.usecase.RemoveFavoriteCityUseCase
 
 class HomeViewModel(
+    savedStateHandle: SavedStateHandle,
     private val getWeatherForNext24HoursUseCase: GetWeatherForNext24HoursUseCase,
     private val getDailyWeatherSummariesUseCase: GetDailyWeatherSummariesUseCase,
-    private val locationTracker: LocationTracker
+    private val locationTracker: LocationTracker,
+    private val addFavoriteCityUseCase: AddFavoriteCityUseCase,
+    private val isCityFavoriteUseCase: IsCityFavoriteUseCase,
+    private val removeFavoriteCityUseCase: RemoveFavoriteCityUseCase
 ) : ViewModel() {
 
+    val initialCity: String? = savedStateHandle.toRoute<Screen.Home>().cityName
     private val _weatherState = MutableStateFlow(HomeUiState())
     val weatherState: StateFlow<HomeUiState> = _weatherState.asStateFlow()
 
@@ -102,6 +113,7 @@ class HomeViewModel(
                         search = state.search
                     )
                 }
+                refreshFavoriteState()
             }
 
             is Resource.Error -> {
@@ -148,6 +160,27 @@ class HomeViewModel(
                     )
                 }
             }
+        }
+    }
+
+    fun onFavoriteClicked() {
+        val state = _weatherState.value
+        val cityName = state.currentWeather?.cityName ?: return
+        viewModelScope.launch {
+            if (state.isFavorite) {
+                removeFavoriteCityUseCase(cityName)
+            } else {
+                addFavoriteCityUseCase(cityName)
+            }
+            _weatherState.update { it.copy(isFavorite = !state.isFavorite) }
+        }
+    }
+
+    private fun refreshFavoriteState() {
+        val cityName = _weatherState.value.currentWeather?.cityName ?: return
+        viewModelScope.launch {
+            val isFavorite = isCityFavoriteUseCase(cityName)
+            _weatherState.update { it.copy(isFavorite = isFavorite) }
         }
     }
 }

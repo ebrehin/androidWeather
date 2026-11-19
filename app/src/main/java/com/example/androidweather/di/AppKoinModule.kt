@@ -23,6 +23,13 @@ import org.koin.dsl.module
 import androidx.room.Room
 import com.example.androidweather.data.local.WeatherDatabase
 import org.koin.android.ext.koin.androidContext
+import com.example.androidweather.data.repository.FavoriteRepository
+import com.example.androidweather.domain.repository.FavoriteRepositoryInterface
+import com.example.androidweather.domain.usecase.AddFavoriteCityUseCase
+import com.example.androidweather.domain.usecase.GetFavoriteCitiesUseCase
+import com.example.androidweather.domain.usecase.IsCityFavoriteUseCase
+import com.example.androidweather.domain.usecase.RemoveFavoriteCityUseCase
+import com.example.androidweather.presentation.screen.favorites.FavoritesViewModel
 
 val appModule = module {
     // Configuration API et client HTTP
@@ -33,6 +40,9 @@ val appModule = module {
     single { CoroutineScope(Dispatchers.Default + SupervisorJob()) }
     single { OpenWeatherApi(get(), get(named("weather_api_key"))) }
 
+    // Couche Data : base locale Room
+    single { get<WeatherDatabase>().weatherDao() }
+    single { get<WeatherDatabase>().favoriteDao() }
     // Couche Data : base locale Room (cache)
     single {
         Room.databaseBuilder(androidContext(), WeatherDatabase::class.java, "weather.db")
@@ -43,6 +53,7 @@ val appModule = module {
 
     // Couche Data : repository
     single<WeatherRepositoryInterface> { WeatherRepository(get(), get()) }
+    single<FavoriteRepositoryInterface> { FavoriteRepository(get()) }
 
     // Couche Utils
     single { LocationTracker(get()) }
@@ -51,20 +62,35 @@ val appModule = module {
     single { GetWeatherForNext24HoursUseCase(get()) }
     single { GetDailyWeatherSummariesUseCase(get()) }
     single { GetWeatherByDateUseCase(get()) }
+    single { GetFavoriteCitiesUseCase(get()) }
+    single { AddFavoriteCityUseCase(get()) }
+    single { RemoveFavoriteCityUseCase(get()) }
+    single { IsCityFavoriteUseCase(get()) }
 
     // Couche Presentation (ViewModel)
-    viewModel { 
+    viewModel { (handle: SavedStateHandle) ->
         HomeViewModel(
+            savedStateHandle = handle,
             getWeatherForNext24HoursUseCase = get(),
             getDailyWeatherSummariesUseCase = get(),
-            locationTracker = get()
-        ) 
+            locationTracker = get(),
+            addFavoriteCityUseCase = get(),
+            isCityFavoriteUseCase = get(),
+            removeFavoriteCityUseCase = get()
+        )
     }
 
     viewModel { (handle: SavedStateHandle) ->
         DetailViewModel(
             savedStateHandle = handle,
             getWeatherByDateUseCase = get()
+        )
+    }
+
+    viewModel {
+        FavoritesViewModel(
+            getFavoriteCitiesUseCase = get(),
+            removeFavoriteCityUseCase = get()
         )
     }
 }

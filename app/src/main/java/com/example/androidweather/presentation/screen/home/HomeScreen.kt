@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -17,6 +16,12 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.ui.res.stringResource
+import com.example.androidweather.R
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -47,7 +52,10 @@ import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(onNavigateToDetail: (String, String, Double?, Double?) -> Unit) {
+fun HomeScreen(
+    onNavigateToFavorites: () -> Unit,
+    onNavigateToDetail: (String, String, Double?, Double?) -> Unit
+) {
     val viewModel = koinViewModel<HomeViewModel>()
     val weatherState by viewModel.weatherState.collectAsState()
     var cityName by rememberSaveable { mutableStateOf("") }
@@ -68,6 +76,12 @@ fun HomeScreen(onNavigateToDetail: (String, String, Double?, Double?) -> Unit) {
     LaunchedEffect(Unit) {
         if (weatherState.search != HomeUiState.SearchCriteria()) {
             viewModel.refresh()
+            return@LaunchedEffect
+        }
+
+        // Une ville a été choisie dans la liste des favoris
+        viewModel.initialCity?.let {
+            viewModel.cityChanged(it)
             return@LaunchedEffect
         }
 
@@ -101,6 +115,14 @@ fun HomeScreen(onNavigateToDetail: (String, String, Double?, Double?) -> Unit) {
                                 Text(text = "Météo " + currentWeather.cityName)
                             }
                         }
+                    }
+                },
+                actions = {
+                    IconButton(onClick = onNavigateToFavorites) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.List,
+                            contentDescription = stringResource(R.string.favorites_title)
+                        )
                     }
                 }
             )
@@ -158,7 +180,9 @@ fun HomeScreen(onNavigateToDetail: (String, String, Double?, Double?) -> Unit) {
                             city = currentWeather.cityName,
                             temp = currentWeather.temperatureText,
                             weatherType = currentWeather.weatherType,
-                            humidity = currentWeather.humidityText
+                            humidity = currentWeather.humidityText,
+                            isFavorite = weatherState.isFavorite,
+                            onFavoriteClick = { viewModel.onFavoriteClicked() },
                         )
                     }
 
@@ -190,10 +214,10 @@ fun HomeScreen(onNavigateToDetail: (String, String, Double?, Double?) -> Unit) {
 
                     when {
                         weatherState.dailyForecast.isLoading -> {
-                        Text(
-                            modifier = Modifier.padding(horizontal = 16.dp),
-                            text = "Chargement des prévisions journalières..."
-                        )
+                            Text(
+                                modifier = Modifier.padding(horizontal = 16.dp),
+                                text = "Chargement des prévisions journalières..."
+                            )
                         }
                         weatherState.dailyForecast.errorMessage != null -> {
                             ErrorCard(message = weatherState.dailyForecast.errorMessage!!)

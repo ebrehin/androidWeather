@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">AndroidWeather</string>
     <string name="weather_title">Météo</string>
+    <string name="add_favorite_description">Ajouter aux favoris</string>
+    <string name="favorites_title">Mes favoris</string>
+    <string name="no_favorites">Aucune ville favorite pour le moment.</string>
+    <string name="remove_favorite_description">Retirer des favoris</string>
     <string name="search_description">Rechercher une ville</string>
     <string name="search_placeholder">Nom de la ville</string>
     <string name="clear_description">Effacer la recherche</string>
